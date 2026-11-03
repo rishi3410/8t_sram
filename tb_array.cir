@@ -1,0 +1,132 @@
+* ==========================================
+* tb_array.cir  -  4x4 6T SRAM array: write / read / retention test
+* Row0: 0101 -> write 1010   Row1: 1010 -> write 0101
+* Row2: 1100 and Row3: 0011 are NEVER written (retention check)
+* Digits are listed in column order C0 C1 C2 C3
+* ==========================================
+
+.include sram6t_cell.inc
+.include sram_array.inc
+
+.param VDDVAL=1.0
+VDD vdd 0 {VDDVAL}
+
+* ---- bit-line capacitances ----
+CBL0  bl0  0 20f
+CBLB0 blb0 0 20f
+CBL1  bl1  0 20f
+CBLB1 blb1 0 20f
+CBL2  bl2  0 20f
+CBLB2 blb2 0 20f
+CBL3  bl3  0 20f
+CBLB3 blb3 0 20f
+
+* ---- precharge PMOS (pre = 0 -> ON) ----
+MPRE0  bl0  pre vdd vdd PMOS W=4u L=1u
+MPREB0 blb0 pre vdd vdd PMOS W=4u L=1u
+MPRE1  bl1  pre vdd vdd PMOS W=4u L=1u
+MPREB1 blb1 pre vdd vdd PMOS W=4u L=1u
+MPRE2  bl2  pre vdd vdd PMOS W=4u L=1u
+MPREB2 blb2 pre vdd vdd PMOS W=4u L=1u
+MPRE3  bl3  pre vdd vdd PMOS W=4u L=1u
+MPREB3 blb3 pre vdd vdd PMOS W=4u L=1u
+VPRE pre 0 PWL(0n 0 9.9n 0 10n 1 55n 1 55.1n 0 63n 0 63.1n 1 85n 1 85.1n 0 93n 0 93.1n 1 115n 1 115.1n 0 123n 0 123.1n 1 145n 1 145.1n 0 153n 0 153.1n 1)
+
+* ---- write drivers: data source -> switch -> bit-line (wen = 1 -> connected) ----
+.model SWMOD SW (VT=0.5 VH=0.1 RON=200 ROFF=1G)
+SBL0  bld0  bl0  wen 0 SWMOD
+SBLB0 bldb0 blb0 wen 0 SWMOD
+SBL1  bld1  bl1  wen 0 SWMOD
+SBLB1 bldb1 blb1 wen 0 SWMOD
+SBL2  bld2  bl2  wen 0 SWMOD
+SBLB2 bldb2 blb2 wen 0 SWMOD
+SBL3  bld3  bl3  wen 0 SWMOD
+SBLB3 bldb3 blb3 wen 0 SWMOD
+VWEN wen 0 PWL(0n 0 12n 0 12.1n 1 28n 1 28.1n 0 32n 0 32.1n 1 48n 1 48.1n 0)
+VBLD0  bld0  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD0 bldb0 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD1  bld1  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD1 bldb1 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD2  bld2  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD2 bldb2 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD3  bld3  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD3 bldb3 0 PWL(0n 1 29.9n 1 30n 0)
+
+* ---- word lines ----
+VWL0 wl0 0 PWL(0n 0 15n 0 15.1n 1 25n 1 25.1n 0 65n 0 65.1n 1 75n 1 75.1n 0)
+VWL1 wl1 0 PWL(0n 0 35n 0 35.1n 1 45n 1 45.1n 0 95n 0 95.1n 1 105n 1 105.1n 0)
+VWL2 wl2 0 PWL(0n 0 125n 0 125.1n 1 135n 1 135.1n 0)
+VWL3 wl3 0 PWL(0n 0 155n 0 155.1n 1 165n 1 165.1n 0)
+
+* ---- the array under test ----
+XARR wl0 wl1 wl2 wl3 bl0 blb0 bl1 blb1 bl2 blb2 bl3 blb3 vdd 0 SRAM4X4
+
+* ---- initial stored data (nodeset only picks the starting state) ----
+.nodeset V(xarr.xrow0.q0)=0 V(xarr.xrow0.qb0)=1
+.nodeset V(xarr.xrow0.q1)=1 V(xarr.xrow0.qb1)=0
+.nodeset V(xarr.xrow0.q2)=0 V(xarr.xrow0.qb2)=1
+.nodeset V(xarr.xrow0.q3)=1 V(xarr.xrow0.qb3)=0
+.nodeset V(xarr.xrow1.q0)=1 V(xarr.xrow1.qb0)=0
+.nodeset V(xarr.xrow1.q1)=0 V(xarr.xrow1.qb1)=1
+.nodeset V(xarr.xrow1.q2)=1 V(xarr.xrow1.qb2)=0
+.nodeset V(xarr.xrow1.q3)=0 V(xarr.xrow1.qb3)=1
+.nodeset V(xarr.xrow2.q0)=1 V(xarr.xrow2.qb0)=0
+.nodeset V(xarr.xrow2.q1)=1 V(xarr.xrow2.qb1)=0
+.nodeset V(xarr.xrow2.q2)=0 V(xarr.xrow2.qb2)=1
+.nodeset V(xarr.xrow2.q3)=0 V(xarr.xrow2.qb3)=1
+.nodeset V(xarr.xrow3.q0)=0 V(xarr.xrow3.qb0)=1
+.nodeset V(xarr.xrow3.q1)=0 V(xarr.xrow3.qb1)=1
+.nodeset V(xarr.xrow3.q2)=1 V(xarr.xrow3.qb2)=0
+.nodeset V(xarr.xrow3.q3)=1 V(xarr.xrow3.qb3)=0
+
+.control
+set noaskquit
+tran 20p 180n
+
+* ---- READ-BACK: BL minus BLB at the end of each read pulse ----
+let diff0 = v(bl0) - v(blb0)
+let diff1 = v(bl1) - v(blb1)
+let diff2 = v(bl2) - v(blb2)
+let diff3 = v(bl3) - v(blb3)
+* positive = stored 1,  negative = stored 0
+meas tran rd_r0c0 FIND diff0 AT=73n
+meas tran rd_r0c1 FIND diff1 AT=73n
+meas tran rd_r0c2 FIND diff2 AT=73n
+meas tran rd_r0c3 FIND diff3 AT=73n
+meas tran rd_r1c0 FIND diff0 AT=103n
+meas tran rd_r1c1 FIND diff1 AT=103n
+meas tran rd_r1c2 FIND diff2 AT=103n
+meas tran rd_r1c3 FIND diff3 AT=103n
+meas tran rd_r2c0 FIND diff0 AT=133n
+meas tran rd_r2c1 FIND diff1 AT=133n
+meas tran rd_r2c2 FIND diff2 AT=133n
+meas tran rd_r2c3 FIND diff3 AT=133n
+meas tran rd_r3c0 FIND diff0 AT=163n
+meas tran rd_r3c1 FIND diff1 AT=163n
+meas tran rd_r3c2 FIND diff2 AT=163n
+meas tran rd_r3c3 FIND diff3 AT=163n
+
+* ---- FINAL STATE of all 16 stored nodes (Q) at 175 ns ----
+meas tran q_r0c0 FIND v(xarr.xrow0.q0) AT=175n
+meas tran q_r0c1 FIND v(xarr.xrow0.q1) AT=175n
+meas tran q_r0c2 FIND v(xarr.xrow0.q2) AT=175n
+meas tran q_r0c3 FIND v(xarr.xrow0.q3) AT=175n
+meas tran q_r1c0 FIND v(xarr.xrow1.q0) AT=175n
+meas tran q_r1c1 FIND v(xarr.xrow1.q1) AT=175n
+meas tran q_r1c2 FIND v(xarr.xrow1.q2) AT=175n
+meas tran q_r1c3 FIND v(xarr.xrow1.q3) AT=175n
+meas tran q_r2c0 FIND v(xarr.xrow2.q0) AT=175n
+meas tran q_r2c1 FIND v(xarr.xrow2.q1) AT=175n
+meas tran q_r2c2 FIND v(xarr.xrow2.q2) AT=175n
+meas tran q_r2c3 FIND v(xarr.xrow2.q3) AT=175n
+meas tran q_r3c0 FIND v(xarr.xrow3.q0) AT=175n
+meas tran q_r3c1 FIND v(xarr.xrow3.q1) AT=175n
+meas tran q_r3c2 FIND v(xarr.xrow3.q2) AT=175n
+meas tran q_r3c3 FIND v(xarr.xrow3.q3) AT=175n
+
+plot v(wl0) v(wl1) v(wl2) v(wl3)
+plot v(xarr.xrow0.q0) v(xarr.xrow0.q1) v(xarr.xrow0.q2) v(xarr.xrow0.q3)
+plot v(xarr.xrow1.q0) v(xarr.xrow1.q1) v(xarr.xrow1.q2) v(xarr.xrow1.q3)
+plot v(bl0) v(blb0) v(bl1) v(blb1)
+.endc
+.end

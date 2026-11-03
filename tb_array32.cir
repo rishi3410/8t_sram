@@ -1,0 +1,376 @@
+* ==========================================
+* tb_array_32x32.cir  -  32x32 6T SRAM array: write / read / retention test
+* Row0: alternating 0101... -> write 1010...   Row1: alternating 1010... -> write 0101...
+* Row2 and Row3 (along with Rows 4..31) are NEVER written (retention check)
+* Digits are listed in column order C0..C31
+* ==========================================
+
+.include sram6t_cell.inc
+.include sram_array_32x32.inc
+
+.param VDDVAL=1.0
+VDD vdd 0 {VDDVAL}
+
+* ---- bit-line capacitances (scaled to 160f for 32 cells per column) ----
+CBL0   bl0   0 160f
+CBLB0  blb0  0 160f
+CBL1   bl1   0 160f
+CBLB1  blb1  0 160f
+CBL2   bl2   0 160f
+CBLB2  blb2  0 160f
+CBL3   bl3   0 160f
+CBLB3  blb3  0 160f
+CBL4   bl4   0 160f
+CBLB4  blb4  0 160f
+CBL5   bl5   0 160f
+CBLB5  blb5  0 160f
+CBL6   bl6   0 160f
+CBLB6  blb6  0 160f
+CBL7   bl7   0 160f
+CBLB7  blb7  0 160f
+CBL8   bl8   0 160f
+CBLB8  blb8  0 160f
+CBL9   bl9   0 160f
+CBLB9  blb9  0 160f
+CBL10  bl10  0 160f
+CBLB10 blb10 0 160f
+CBL11  bl11  0 160f
+CBLB11 blb11 0 160f
+CBL12  bl12  0 160f
+CBLB12 blb12 0 160f
+CBL13  bl13  0 160f
+CBLB13 blb13 0 160f
+CBL14  bl14  0 160f
+CBLB14 blb14 0 160f
+CBL15  bl15  0 160f
+CBLB15 blb15 0 160f
+CBL16  bl16  0 160f
+CBLB16 blb16 0 160f
+CBL17  bl17  0 160f
+CBLB17 blb17 0 160f
+CBL18  bl18  0 160f
+CBLB18 blb18 0 160f
+CBL19  bl19  0 160f
+CBLB19 blb19 0 160f
+CBL20  bl20  0 160f
+CBLB20 blb20 0 160f
+CBL21  bl21  0 160f
+CBLB21 blb21 0 160f
+CBL22  bl22  0 160f
+CBLB22 blb22 0 160f
+CBL23  bl23  0 160f
+CBLB23 blb23 0 160f
+CBL24  bl24  0 160f
+CBLB24 blb24 0 160f
+CBL25  bl25  0 160f
+CBLB25 blb25 0 160f
+CBL26  bl26  0 160f
+CBLB26 blb26 0 160f
+CBL27  bl27  0 160f
+CBLB27 blb27 0 160f
+CBL28  bl28  0 160f
+CBLB28 blb28 0 160f
+CBL29  bl29  0 160f
+CBLB29 blb29 0 160f
+CBL30  bl30  0 160f
+CBLB30 blb30 0 160f
+CBL31  bl31  0 160f
+CBLB31 blb31 0 160f
+
+* ---- precharge PMOS (pre = 0 -> ON) ----
+MPRE0   bl0   pre vdd vdd PMOS W=4u L=1u
+MPREB0  blb0  pre vdd vdd PMOS W=4u L=1u
+MPRE1   bl1   pre vdd vdd PMOS W=4u L=1u
+MPREB1  blb1  pre vdd vdd PMOS W=4u L=1u
+MPRE2   bl2   pre vdd vdd PMOS W=4u L=1u
+MPREB2  blb2  pre vdd vdd PMOS W=4u L=1u
+MPRE3   bl3   pre vdd vdd PMOS W=4u L=1u
+MPREB3  blb3  pre vdd vdd PMOS W=4u L=1u
+MPRE4   bl4   pre vdd vdd PMOS W=4u L=1u
+MPREB4  blb4  pre vdd vdd PMOS W=4u L=1u
+MPRE5   bl5   pre vdd vdd PMOS W=4u L=1u
+MPREB5  blb5  pre vdd vdd PMOS W=4u L=1u
+MPRE6   bl6   pre vdd vdd PMOS W=4u L=1u
+MPREB6  blb6  pre vdd vdd PMOS W=4u L=1u
+MPRE7   bl7   pre vdd vdd PMOS W=4u L=1u
+MPREB7  blb7  pre vdd vdd PMOS W=4u L=1u
+MPRE8   bl8   pre vdd vdd PMOS W=4u L=1u
+MPREB8  blb8  pre vdd vdd PMOS W=4u L=1u
+MPRE9   bl9   pre vdd vdd PMOS W=4u L=1u
+MPREB9  blb9  pre vdd vdd PMOS W=4u L=1u
+MPRE10  bl10  pre vdd vdd PMOS W=4u L=1u
+MPREB10 blb10 pre vdd vdd PMOS W=4u L=1u
+MPRE11  bl11  pre vdd vdd PMOS W=4u L=1u
+MPREB11 blb11 pre vdd vdd PMOS W=4u L=1u
+MPRE12  bl12  pre vdd vdd PMOS W=4u L=1u
+MPREB12 blb12 pre vdd vdd PMOS W=4u L=1u
+MPRE13  bl13  pre vdd vdd PMOS W=4u L=1u
+MPREB13 blb13 pre vdd vdd PMOS W=4u L=1u
+MPRE14  bl14  pre vdd vdd PMOS W=4u L=1u
+MPREB14 blb14 pre vdd vdd PMOS W=4u L=1u
+MPRE15  bl15  pre vdd vdd PMOS W=4u L=1u
+MPREB15 blb15 pre vdd vdd PMOS W=4u L=1u
+MPRE16  bl16  pre vdd vdd PMOS W=4u L=1u
+MPREB16 blb16 pre vdd vdd PMOS W=4u L=1u
+MPRE17  bl17  pre vdd vdd PMOS W=4u L=1u
+MPREB17 blb17 pre vdd vdd PMOS W=4u L=1u
+MPRE18  bl18  pre vdd vdd PMOS W=4u L=1u
+MPREB18 blb18 pre vdd vdd PMOS W=4u L=1u
+MPRE19  bl19  pre vdd vdd PMOS W=4u L=1u
+MPREB19 blb19 pre vdd vdd PMOS W=4u L=1u
+MPRE20  bl20  pre vdd vdd PMOS W=4u L=1u
+MPREB20 blb20 pre vdd vdd PMOS W=4u L=1u
+MPRE21  bl21  pre vdd vdd PMOS W=4u L=1u
+MPREB21 blb21 pre vdd vdd PMOS W=4u L=1u
+MPRE22  bl22  pre vdd vdd PMOS W=4u L=1u
+MPREB22 blb22 pre vdd vdd PMOS W=4u L=1u
+MPRE23  bl23  pre vdd vdd PMOS W=4u L=1u
+MPREB23 blb23 pre vdd vdd PMOS W=4u L=1u
+MPRE24  bl24  pre vdd vdd PMOS W=4u L=1u
+MPREB24 blb24 pre vdd vdd PMOS W=4u L=1u
+MPRE25  bl25  pre vdd vdd PMOS W=4u L=1u
+MPREB25 blb25 pre vdd vdd PMOS W=4u L=1u
+MPRE26  bl26  pre vdd vdd PMOS W=4u L=1u
+MPREB26 blb26 pre vdd vdd PMOS W=4u L=1u
+MPRE27  bl27  pre vdd vdd PMOS W=4u L=1u
+MPREB27 blb27 pre vdd vdd PMOS W=4u L=1u
+MPRE28  bl28  pre vdd vdd PMOS W=4u L=1u
+MPREB28 blb28 pre vdd vdd PMOS W=4u L=1u
+MPRE29  bl29  pre vdd vdd PMOS W=4u L=1u
+MPREB29 blb29 pre vdd vdd PMOS W=4u L=1u
+MPRE30  bl30  pre vdd vdd PMOS W=4u L=1u
+MPREB30 blb30 pre vdd vdd PMOS W=4u L=1u
+MPRE31  bl31  pre vdd vdd PMOS W=4u L=1u
+MPREB31 blb31 pre vdd vdd PMOS W=4u L=1u
+VPRE pre 0 PWL(0n 0 9.9n 0 10n 1 55n 1 55.1n 0 63n 0 63.1n 1 85n 1 85.1n 0 93n 0 93.1n 1 115n 1 115.1n 0 123n 0 123.1n 1 145n 1 145.1n 0 153n 0 153.1n 1)
+
+* ---- write drivers: data source -> switch -> bit-line (wen = 1 -> connected) ----
+.model SWMOD SW (VT=0.5 VH=0.1 RON=200 ROFF=1G)
+SBL0   bld0   bl0   wen 0 SWMOD
+SBLB0  bldb0  blb0  wen 0 SWMOD
+SBL1   bld1   bl1   wen 0 SWMOD
+SBLB1  bldb1  blb1  wen 0 SWMOD
+SBL2   bld2   bl2   wen 0 SWMOD
+SBLB2  bldb2  blb2  wen 0 SWMOD
+SBL3   bld3   bl3   wen 0 SWMOD
+SBLB3  bldb3  blb3  wen 0 SWMOD
+SBL4   bld4   bl4   wen 0 SWMOD
+SBLB4  bldb4  blb4  wen 0 SWMOD
+SBL5   bld5   bl5   wen 0 SWMOD
+SBLB5  bldb5  blb5  wen 0 SWMOD
+SBL6   bld6   bl6   wen 0 SWMOD
+SBLB6  bldb6  blb6  wen 0 SWMOD
+SBL7   bld7   bl7   wen 0 SWMOD
+SBLB7  bldb7  blb7  wen 0 SWMOD
+SBL8   bld8   bl8   wen 0 SWMOD
+SBLB8  bldb8  blb8  wen 0 SWMOD
+SBL9   bld9   bl9   wen 0 SWMOD
+SBLB9  bldb9  blb9  wen 0 SWMOD
+SBL10  bld10  bl10  wen 0 SWMOD
+SBLB10 bldb10 blb10 wen 0 SWMOD
+SBL11  bld11  bl11  wen 0 SWMOD
+SBLB11 bldb11 blb11 wen 0 SWMOD
+SBL12  bld12  bl12  wen 0 SWMOD
+SBLB12 bldb12 blb12 wen 0 SWMOD
+SBL13  bld13  bl13  wen 0 SWMOD
+SBLB13 bldb13 blb13 wen 0 SWMOD
+SBL14  bld14  bl14  wen 0 SWMOD
+SBLB14 bldb14 blb14 wen 0 SWMOD
+SBL15  bld15  bl15  wen 0 SWMOD
+SBLB15 bldb15 blb15 wen 0 SWMOD
+SBL16  bld16  bl16  wen 0 SWMOD
+SBLB16 bldb16 blb16 wen 0 SWMOD
+SBL17  bld17  bl17  wen 0 SWMOD
+SBLB17 bldb17 blb17 wen 0 SWMOD
+SBL18  bld18  bl18  wen 0 SWMOD
+SBLB18 bldb18 blb18 wen 0 SWMOD
+SBL19  bld19  bl19  wen 0 SWMOD
+SBLB19 bldb19 blb19 wen 0 SWMOD
+SBL20  bld20  bl20  wen 0 SWMOD
+SBLB20 bldb20 blb20 wen 0 SWMOD
+SBL21  bld21  bl21  wen 0 SWMOD
+SBLB21 bldb21 blb21 wen 0 SWMOD
+SBL22  bld22  bl22  wen 0 SWMOD
+SBLB22 bldb22 blb22 wen 0 SWMOD
+SBL23  bld23  bl23  wen 0 SWMOD
+SBLB23 bldb23 blb23 wen 0 SWMOD
+SBL24  bld24  bl24  wen 0 SWMOD
+SBLB24 bldb24 blb24 wen 0 SWMOD
+SBL25  bld25  bl25  wen 0 SWMOD
+SBLB25 bldb25 blb25 wen 0 SWMOD
+SBL26  bld26  bl26  wen 0 SWMOD
+SBLB26 bldb26 blb26 wen 0 SWMOD
+SBL27  bld27  bl27  wen 0 SWMOD
+SBLB27 bldb27 blb27 wen 0 SWMOD
+SBL28  bld28  bl28  wen 0 SWMOD
+SBLB28 bldb28 blb28 wen 0 SWMOD
+SBL29  bld29  bl29  wen 0 SWMOD
+SBLB29 bldb29 blb29 wen 0 SWMOD
+SBL30  bld30  bl30  wen 0 SWMOD
+SBLB30 bldb30 blb30 wen 0 SWMOD
+SBL31  bld31  bl31  wen 0 SWMOD
+SBLB31 bldb31 blb31 wen 0 SWMOD
+VWEN wen 0 PWL(0n 0 12n 0 12.1n 1 28n 1 28.1n 0 32n 0 32.1n 1 48n 1 48.1n 0)
+
+* Even columns: 1 then switches to 0 at 30ns
+VBLD0   bld0   0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD0  bldb0  0 PWL(0n 0 29.9n 0 30n 1)
+VBLD2   bld2   0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD2  bldb2  0 PWL(0n 0 29.9n 0 30n 1)
+VBLD4   bld4   0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD4  bldb4  0 PWL(0n 0 29.9n 0 30n 1)
+VBLD6   bld6   0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD6  bldb6  0 PWL(0n 0 29.9n 0 30n 1)
+VBLD8   bld8   0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD8  bldb8  0 PWL(0n 0 29.9n 0 30n 1)
+VBLD10  bld10  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD10 bldb10 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD12  bld12  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD12 bldb12 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD14  bld14  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD14 bldb14 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD16  bld16  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD16 bldb16 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD18  bld18  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD18 bldb18 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD20  bld20  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD20 bldb20 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD22  bld22  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD22 bldb22 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD24  bld24  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD24 bldb24 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD26  bld26  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD26 bldb26 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD28  bld28  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD28 bldb28 0 PWL(0n 0 29.9n 0 30n 1)
+VBLD30  bld30  0 PWL(0n 1 29.9n 1 30n 0)
+VBLBD30 bldb30 0 PWL(0n 0 29.9n 0 30n 1)
+
+* Odd columns: 0 then switches to 1 at 30ns
+VBLD1   bld1   0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD1  bldb1  0 PWL(0n 1 29.9n 1 30n 0)
+VBLD3   bld3   0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD3  bldb3  0 PWL(0n 1 29.9n 1 30n 0)
+VBLD5   bld5   0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD5  bldb5  0 PWL(0n 1 29.9n 1 30n 0)
+VBLD7   bld7   0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD7  bldb7  0 PWL(0n 1 29.9n 1 30n 0)
+VBLD9   bld9   0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD9  bldb9  0 PWL(0n 1 29.9n 1 30n 0)
+VBLD11  bld11  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD11 bldb11 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD13  bld13  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD13 bldb13 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD15  bld15  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD15 bldb15 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD17  bld17  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD17 bldb17 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD19  bld19  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD19 bldb19 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD21  bld21  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD21 bldb21 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD23  bld23  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD23 bldb23 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD25  bld25  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD25 bldb25 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD27  bld27  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD27 bldb27 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD29  bld29  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD29 bldb29 0 PWL(0n 1 29.9n 1 30n 0)
+VBLD31  bld31  0 PWL(0n 0 29.9n 0 30n 1)
+VBLBD31 bldb31 0 PWL(0n 1 29.9n 1 30n 0)
+
+* ---- word lines (Rows 0..3 active as in schedule, Rows 4..31 tied low) ----
+VWL0  wl0  0 PWL(0n 0 15n 0 15.1n 1 25n 1 25.1n 0 65n 0 65.1n 1 75n 1 75.1n 0)
+VWL1  wl1  0 PWL(0n 0 35n 0 35.1n 1 45n 1 45.1n 0 95n 0 95.1n 1 105n 1 105.1n 0)
+VWL2  wl2  0 PWL(0n 0 125n 0 125.1n 1 135n 1 135.1n 0)
+VWL3  wl3  0 PWL(0n 0 155n 0 155.1n 1 165n 1 165.1n 0)
+VWL4  wl4  0 DC 0
+VWL5  wl5  0 DC 0
+VWL6  wl6  0 DC 0
+VWL7  wl7  0 DC 0
+VWL8  wl8  0 DC 0
+VWL9  wl9  0 DC 0
+VWL10 wl10 0 DC 0
+VWL11 wl11 0 DC 0
+VWL12 wl12 0 DC 0
+VWL13 wl13 0 DC 0
+VWL14 wl14 0 DC 0
+VWL15 wl15 0 DC 0
+VWL16 wl16 0 DC 0
+VWL17 wl17 0 DC 0
+VWL18 wl18 0 DC 0
+VWL19 wl19 0 DC 0
+VWL20 wl20 0 DC 0
+VWL21 wl21 0 DC 0
+VWL22 wl22 0 DC 0
+VWL23 wl23 0 DC 0
+VWL24 wl24 0 DC 0
+VWL25 wl25 0 DC 0
+VWL26 wl26 0 DC 0
+VWL27 wl27 0 DC 0
+VWL28 wl28 0 DC 0
+VWL29 wl29 0 DC 0
+VWL30 wl30 0 DC 0
+VWL31 wl31 0 DC 0
+
+* ---- the array under test ----
+XARR wl0 wl1 wl2 wl3 wl4 wl5 wl6 wl7 wl8 wl9 wl10 wl11 wl12 wl13 wl14 wl15 wl16 wl17 wl18 wl19 wl20 wl21 wl22 wl23 wl24 wl25 wl26 wl27 wl28 wl29 wl30 wl31 bl0 blb0 bl1 blb1 bl2 blb2 bl3 blb3 bl4 blb4 bl5 blb5 bl6 blb6 bl7 blb7 bl8 blb8 bl9 blb9 bl10 blb10 bl11 blb11 bl12 blb12 bl13 blb13 bl14 blb14 bl15 blb15 bl16 blb16 bl17 blb17 bl18 blb18 bl19 blb19 bl20 blb20 bl21 blb21 bl22 blb22 bl23 blb23 bl24 blb24 bl25 blb25 bl26 blb26 bl27 blb27 bl28 blb28 bl29 blb29 bl30 blb30 bl31 blb31 vdd 0 SRAM32X32
+
+* ---- initial stored data (nodeset convergence hint for active rows 0..3) ----
+.nodeset V(xarr.xrow0.q0)=0 V(xarr.xrow0.qb0)=1 V(xarr.xrow0.q1)=1 V(xarr.xrow0.qb1)=0 V(xarr.xrow0.q2)=0 V(xarr.xrow0.qb2)=1 V(xarr.xrow0.q3)=1 V(xarr.xrow0.qb3)=0
+.nodeset V(xarr.xrow1.q0)=1 V(xarr.xrow1.qb0)=0 V(xarr.xrow1.q1)=0 V(xarr.xrow1.qb1)=1 V(xarr.xrow1.q2)=1 V(xarr.xrow1.qb2)=0 V(xarr.xrow1.q3)=0 V(xarr.xrow1.qb3)=1
+.nodeset V(xarr.xrow2.q0)=1 V(xarr.xrow2.qb0)=0 V(xarr.xrow2.q1)=1 V(xarr.xrow2.qb1)=0 V(xarr.xrow2.q2)=0 V(xarr.xrow2.qb2)=1 V(xarr.xrow2.q3)=0 V(xarr.xrow2.qb3)=1
+.nodeset V(xarr.xrow3.q0)=0 V(xarr.xrow3.qb0)=1 V(xarr.xrow3.q1)=0 V(xarr.xrow3.qb1)=1 V(xarr.xrow3.q2)=1 V(xarr.xrow3.qb2)=0 V(xarr.xrow3.q3)=1 V(xarr.xrow3.qb3)=0
+
+.control
+set noaskquit
+tran 20p 180n
+
+* ---- READ-BACK: BL minus BLB at the end of each read pulse ----
+let diff0 = v(bl0) - v(blb0)
+let diff1 = v(bl1) - v(blb1)
+let diff2 = v(bl2) - v(blb2)
+let diff3 = v(bl3) - v(blb3)
+* positive = stored 1,  negative = stored 0
+meas tran rd_r0c0 FIND diff0 AT=73n
+meas tran rd_r0c1 FIND diff1 AT=73n
+meas tran rd_r0c2 FIND diff2 AT=73n
+meas tran rd_r0c3 FIND diff3 AT=73n
+meas tran rd_r1c0 FIND diff0 AT=103n
+meas tran rd_r1c1 FIND diff1 AT=103n
+meas tran rd_r1c2 FIND diff2 AT=103n
+meas tran rd_r1c3 FIND diff3 AT=103n
+meas tran rd_r2c0 FIND diff0 AT=133n
+meas tran rd_r2c1 FIND diff1 AT=133n
+meas tran rd_r2c2 FIND diff2 AT=133n
+meas tran rd_r2c3 FIND diff3 AT=133n
+meas tran rd_r3c0 FIND diff0 AT=163n
+meas tran rd_r3c1 FIND diff1 AT=163n
+meas tran rd_r3c2 FIND diff2 AT=163n
+meas tran rd_r3c3 FIND diff3 AT=163n
+
+* ---- FINAL STATE of active stored nodes (Q) at 175 ns ----
+meas tran q_r0c0 FIND v(xarr.xrow0.q0) AT=175n
+meas tran q_r0c1 FIND v(xarr.xrow0.q1) AT=175n
+meas tran q_r0c2 FIND v(xarr.xrow0.q2) AT=175n
+meas tran q_r0c3 FIND v(xarr.xrow0.q3) AT=175n
+meas tran q_r1c0 FIND v(xarr.xrow1.q0) AT=175n
+meas tran q_r1c1 FIND v(xarr.xrow1.q1) AT=175n
+meas tran q_r1c2 FIND v(xarr.xrow1.q2) AT=175n
+meas tran q_r1c3 FIND v(xarr.xrow1.q3) AT=175n
+meas tran q_r2c0 FIND v(xarr.xrow2.q0) AT=175n
+meas tran q_r2c1 FIND v(xarr.xrow2.q1) AT=175n
+meas tran q_r2c2 FIND v(xarr.xrow2.q2) AT=175n
+meas tran q_r2c3 FIND v(xarr.xrow2.q3) AT=175n
+meas tran q_r3c0 FIND v(xarr.xrow3.q0) AT=175n
+meas tran q_r3c1 FIND v(xarr.xrow3.q1) AT=175n
+meas tran q_r3c2 FIND v(xarr.xrow3.q2) AT=175n
+meas tran q_r3c3 FIND v(xarr.xrow3.q3) AT=175n
+
+plot v(wl0) v(wl1) v(wl2) v(wl3)
+plot v(xarr.xrow0.q0) v(xarr.xrow0.q1) v(xarr.xrow0.q2) v(xarr.xrow0.q3)
+plot v(xarr.xrow1.q0) v(xarr.xrow1.q1) v(xarr.xrow1.q2) v(xarr.xrow1.q3)
+plot v(bl0) v(blb0) v(bl1) v(blb1)
+.endc
+.end
